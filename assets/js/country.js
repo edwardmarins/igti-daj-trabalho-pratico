@@ -89,50 +89,50 @@ async function getDataByCountry() {
     });
   }
 
-  dailyTotals = [
-    {
-      Country: 'Brazil',
-      Date: '2021-07-01T00:00:00Z',
-      Confirmed: 65163,
-      Deaths: 2029,
-      Recovered: 177995,
-    },
-    {
-      Country: 'Brazil',
-      Date: '2021-07-02T00:00:00Z',
-      Confirmed: 65165,
-      Deaths: 1857,
-      Recovered: 32568,
-    },
-    {
-      Country: 'Brazil',
-      Date: '2021-07-03T00:00:00Z',
-      Confirmed: 54556,
-      Deaths: 1635,
-      Recovered: 14279,
-    },
-    {
-      Country: 'Brazil',
-      Date: '2021-07-04T00:00:00Z',
-      Confirmed: 27783,
-      Deaths: 830,
-      Recovered: 58383,
-    },
-    {
-      Country: 'Brazil',
-      Date: '2021-07-05T00:00:00Z',
-      Confirmed: 22703,
-      Deaths: 695,
-      Recovered: 93078,
-    },
-    {
-      Country: 'Brazil',
-      Date: '2021-07-06T00:00:00Z',
-      Confirmed: 62504,
-      Deaths: 1780,
-      Recovered: 64575,
-    },
-  ];
+  // dailyTotals = [
+  //   {
+  //     Country: 'Brazil',
+  //     Date: '2021-07-01T00:00:00Z',
+  //     Confirmed: 65163,
+  //     Deaths: 2029,
+  //     Recovered: 177995,
+  //   },
+  //   {
+  //     Country: 'Brazil',
+  //     Date: '2021-07-02T00:00:00Z',
+  //     Confirmed: 65165,
+  //     Deaths: 1857,
+  //     Recovered: 32568,
+  //   },
+  //   {
+  //     Country: 'Brazil',
+  //     Date: '2021-07-03T00:00:00Z',
+  //     Confirmed: 54556,
+  //     Deaths: 1635,
+  //     Recovered: 14279,
+  //   },
+  //   {
+  //     Country: 'Brazil',
+  //     Date: '2021-07-04T00:00:00Z',
+  //     Confirmed: 27783,
+  //     Deaths: 830,
+  //     Recovered: 58383,
+  //   },
+  //   {
+  //     Country: 'Brazil',
+  //     Date: '2021-07-05T00:00:00Z',
+  //     Confirmed: 22703,
+  //     Deaths: 695,
+  //     Recovered: 93078,
+  //   },
+  //   {
+  //     Country: 'Brazil',
+  //     Date: '2021-07-06T00:00:00Z',
+  //     Confirmed: 62504,
+  //     Deaths: 1780,
+  //     Recovered: 64575,
+  //   },
+  // ];
 
   kpiconfirmed.innerHTML = formater.format(
     dailyTotals[dailyTotals.length - 1].Confirmed
@@ -143,7 +143,7 @@ async function getDataByCountry() {
   kpirecovered.innerHTML = formater.format(
     dailyTotals[dailyTotals.length - 1].Recovered
   );
-  document.write(JSON.stringify(dailyTotals));
+
   // data = fetch('https://api.covid19api.com/summary')
   //   .then((response) => response.json())
   //   .then((json) => loadInitialData(json));
