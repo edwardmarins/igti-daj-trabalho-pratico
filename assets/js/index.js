@@ -59,7 +59,6 @@ async function getDataByCountry() {
 }
 
 function loadInitialData(json) {
-  //console.log(json);
   confirmed.innerHTML = formater.format(json.Global.TotalConfirmed);
   death.innerHTML = formater.format(json.Global.TotalDeaths);
   recovered.innerHTML = formater.format(json.Global.TotalRecovered);
