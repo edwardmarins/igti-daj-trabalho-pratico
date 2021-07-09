@@ -5,6 +5,7 @@ const kpiconfirmed = document.getElementById('kpiconfirmed');
 const kpideaths = document.getElementById('kpideaths');
 const kpirecovered = document.getElementById('kpirecovered');
 const cmbCountry = document.getElementById('cmbCountry');
+let lineChart;
 
 let baseURL = 'https://api.covid19api.com';
 
@@ -59,7 +60,7 @@ async function getDataByCountry() {
     0,
     0
   );
-  const country = 'Brazil'; // cmbCountry.value;
+  const country = cmbCountry.value;
   const response = await api.get(
     `country/${country}?from=${startDate.toISOString()}&to=${endDate.toISOString()}`
   );
@@ -72,6 +73,7 @@ async function getDataByCountry() {
       return { Country, Date, Confirmed, Deaths, Recovered };
     }
   );
+
   let dailyTotals = [];
   for (let i = 1; i < countryData.length; i++) {
     const today = countryData[i];
@@ -89,68 +91,153 @@ async function getDataByCountry() {
     });
   }
 
-  // dailyTotals = [
-  //   {
-  //     Country: 'Brazil',
-  //     Date: '2021-07-01T00:00:00Z',
-  //     Confirmed: 65163,
-  //     Deaths: 2029,
-  //     Recovered: 177995,
-  //   },
-  //   {
-  //     Country: 'Brazil',
-  //     Date: '2021-07-02T00:00:00Z',
-  //     Confirmed: 65165,
-  //     Deaths: 1857,
-  //     Recovered: 32568,
-  //   },
-  //   {
-  //     Country: 'Brazil',
-  //     Date: '2021-07-03T00:00:00Z',
-  //     Confirmed: 54556,
-  //     Deaths: 1635,
-  //     Recovered: 14279,
-  //   },
-  //   {
-  //     Country: 'Brazil',
-  //     Date: '2021-07-04T00:00:00Z',
-  //     Confirmed: 27783,
-  //     Deaths: 830,
-  //     Recovered: 58383,
-  //   },
-  //   {
-  //     Country: 'Brazil',
-  //     Date: '2021-07-05T00:00:00Z',
-  //     Confirmed: 22703,
-  //     Deaths: 695,
-  //     Recovered: 93078,
-  //   },
-  //   {
-  //     Country: 'Brazil',
-  //     Date: '2021-07-06T00:00:00Z',
-  //     Confirmed: 62504,
-  //     Deaths: 1780,
-  //     Recovered: 64575,
-  //   },
-  // ];
-
   kpiconfirmed.innerHTML = formater.format(
-    dailyTotals[dailyTotals.length - 1].Confirmed
+    countryData[countryData.length - 1].Confirmed
   );
   kpideaths.innerHTML = formater.format(
-    dailyTotals[dailyTotals.length - 1].Deaths
+    countryData[countryData.length - 1].Deaths
   );
   kpirecovered.innerHTML = formater.format(
-    dailyTotals[dailyTotals.length - 1].Recovered
+    countryData[countryData.length - 1].Recovered
   );
 
-  // data = fetch('https://api.covid19api.com/summary')
-  //   .then((response) => response.json())
-  //   .then((json) => loadInitialData(json));
+  const dataSelectedByFilter = returnOptionSelected();
+
+  const chartDates = returnDates(dailyTotals);
+  let chartData = [];
+  let chartDataLabel = '';
+  let chartAverageLabel = '';
+
+  if (dataSelectedByFilter === 'Confirmed') {
+    chartData = returnDailyConfirmed(dailyTotals);
+    chartDataLabel = 'Número de Casos Confirmados';
+    chartAverageLabel = 'Média de Casos Confirmados';
+  } else if (dataSelectedByFilter === 'Deaths') {
+    chartData = returnDailyDeaths(dailyTotals);
+    chartDataLabel = 'Número de Mortes';
+    chartAverageLabel = 'Média de Mortes';
+  } else {
+    chartData = returnDailyRecovered(dailyTotals);
+    chartDataLabel = 'Número de Casos Recuperados';
+    chartAverageLabel = 'Média de Casos Recuperados';
+  }
+
+  const averageValue = returnDataAverage(chartData);
+
+  let chartAverageData = [];
+  chartAverageData = fillArrayChartAverageData(chartData.length, averageValue);
+
+  fillLineChart(
+    chartDates,
+    chartDataLabel,
+    chartData,
+    chartAverageLabel,
+    chartAverageData
+  );
+}
+
+function returnDates(dailyTotals) {
+  dates = [];
+  dailyTotals.forEach((day) => {
+    let oldDate = day.Date;
+    console.log(oldDate.substring(0, 10));
+    dates.push(oldDate.substring(0, 10));
+  });
+
+  return dates;
+}
+
+function returnDailyConfirmed(dailyTotals) {
+  confirmedTotals = [];
+  dailyTotals.forEach((day) => confirmedTotals.push(day.Confirmed));
+  return confirmedTotals;
+}
+
+function returnDailyDeaths(dailyTotals) {
+  deathTotals = [];
+  dailyTotals.forEach((day) => deathTotals.push(day.Deaths));
+  return deathTotals;
+}
+
+function returnDailyRecovered(dailyTotals) {
+  recoveredTotals = [];
+  dailyTotals.forEach((day) => recoveredTotals.push(day.Recovered));
+  return recoveredTotals;
+}
+
+function returnOptionSelected() {
+  var box = document.getElementById('cmbData');
+  optionSelected = box.options[box.selectedIndex].value;
+  return optionSelected;
+}
+
+function returnDataAverage(data) {
+  sum = data.reduce((accumulator, current) => {
+    return accumulator + current;
+  }, 0);
+
+  return sum / data.length;
+}
+
+function fillArrayChartAverageData(numElements, averageValue) {
+  arrayAverageData = [];
+
+  let it = 0;
+  while (it < numElements) {
+    arrayAverageData.push(averageValue);
+    it++;
+  }
+
+  return arrayAverageData;
+}
+
+function fillLineChart(dates, dataLabel, data, averageLabel, averageData) {
+  if (lineChart) lineChart.destroy();
+
+  lineChart = new Chart(document.getElementById('linhas'), {
+    type: 'line',
+    data: {
+      labels: dates,
+      datasets: [
+        {
+          data: data,
+          label: dataLabel,
+          borderColor: 'rgb(60,186,159)',
+          backgroundColor: 'rgb(60,186,159,0.1)',
+        },
+        {
+          data: averageData,
+          label: averageLabel,
+          borderColor: 'rgb(255,140,13)',
+          backgroundColor: 'rgb(255,140,13, 0.1)',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top', //top, bottom, left, rigth
+        },
+        title: {
+          display: true,
+          text: 'Curva diária de Covid-19',
+        },
+        layout: {
+          padding: {
+            left: 100,
+            right: 100,
+            top: 50,
+            bottom: 10,
+          },
+        },
+      },
+    },
+  });
 }
 
 function start() {
-  //getDataByCountry();
   getCountries();
 
   btnFiltro.addEventListener('click', getDataByCountry);
